@@ -1,0 +1,242 @@
+@page "/Jugadas"
+@page "/R_Jugadas/{JugadaId:int}"
+@attribute [Authorize]
+@inject JugadasBLL jugadasBLL
+@inject GananciasBLL gananciaBLL
+@inject NotificationService notificationService;
+
+<EditForm Model="jugadas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="card text-dark bg-light shadow-lg text-primary">
+
+        <div class="card-header text-center">
+            <h4 class=" text-center text-primary">Registro de Jugada</h4>
+        </div>
+        <div class="card-body opacity-75">
+            <div class="row ">
+
+                <div class="row justify-content-between">
+                    @*Compra Id*@
+                    <div class="col-3">
+                        <label>Ticker Id</label>
+                        <div class="input-group mb-3">
+                            <InputNumber class="form-control" @bind-Value="jugadas.JugadaId" />
+                            <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
+                                    class="oi oi-magnifying-glass" /> </button>
+                        </div>
+                    </div>
+
+                    @*Fecha*@
+                    <div class="col-3">
+                        <label>Fecha</label>
+                        <InputDate class="form-control" @bind-Value="jugadas.Fecha" />
+                    </div>
+                </div>
+
+
+
+                @*Loteria*@
+                <div class="col-12">
+                    <label>Loteria</label>
+                    <InputSelect class="form-select" @bind-Value="jugadas.LoteriaId">
+                        <option value="0" disabled> Seleccione </option>
+                        @foreach (var loteria in list)
+                        {
+                            <option value="@loteria.LoteriaId"> @loteria.Nombre</option>
+                        }
+                    </InputSelect>
+                       <ValidationMessage For="@(() => jugadas.LoteriaId)" class="form-control" />
+                </div>
+
+                @*TipoJugada*@
+                <div class="col-12">
+                    <label>Tipo de Jugada</label>
+                    <InputSelect class="form-select" @bind-Value="jugadas.TipoJugadaId">
+                        <option value="0" disabled> Seleccione </option>
+                        @foreach (var tipoJugada in lista)
+                        {
+                            <option value="@tipoJugada.TipoJugadaId"> @tipoJugada.NombreJugada</option>
+                        }
+                    </InputSelect>
+                      <ValidationMessage For="@(() => jugadas.TipoJugadaId)" class="form-control" />
+                </div>
+
+                @*Monto*@
+                <div class="col-12">
+                    <label>Monto Jugado</label>
+                    <div class="input-group mb-3">
+                        <InputNumber class="form-control" @bind-Value="jugadas.Monto" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="card-footer d-flex justify-content-center mb-4">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" @onclick="Nuevo"> <i class="oi oi-file"> Nuevo
+                </i></button>
+            <button type="submit" class="btn btn-success"> <i class="oi oi-document"> Guardar </i></button>
+            <button type="button" class="btn btn-danger" @onclick="Eliminar"><i class="oi oi-trash"> Eliminar
+                </i></button>
+        </div>
+    </div>
+    @*Total*@
+    <div class="row  d-flex justify-content-end mb-3">
+        <div class="col-3">
+            <label>Monto Jugado</label>
+            <span class="form-control"> @jugadas.Monto.ToString("N2") </span>
+        </div>
+    </div>
+</EditForm>
+@code {
+
+    [Parameter]
+    public int JugadaId { get; set; }
+    public Ganancias ganancias = new Ganancias();
+    public Jugadas jugadas { get; set; } = new Jugadas();
+    public List<Jugadas> jugada { get; set; } = new List<Jugadas>();
+    public List<Loterias> list { get; set; }
+    public List<TipoJugada> lista { get; set; }
+    public JugadaDetalle Detalles { get; set; } = new JugadaDetalle();
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var juego = jugadasBLL.BuscarTJ(Detalles.TipoJugadaId);
+        var ganancia = gananciaBLL.BuscarJ(Detalles.GananciaId);
+        var loto = jugadasBLL.BuscarL(Detalles.LoteriaId);
+
+        list = jugadasBLL.LoteryList();
+        lista = jugadasBLL.TypeGame();
+        jugada = jugadasBLL.GetList();
+        jugadas.JugadaId = 0;
+        jugadas.Fecha = DateTime.Now;
+        jugadas.Monto = 0.00;
+        jugadas.JugadaId = JugadaId;
+        jugadas.LoteriaId = 0;
+        jugadas.TipoJugadaId = 0;
+        jugadas.NombreLoteria = "";
+        jugadas.Nombre = "";
+        jugadas.MontoGanancia = 0.00;
+        Buscar();
+
+    }
+
+    public void Nuevo()
+    {
+        if (jugadas.Monto > 0)
+        {
+
+            jugadas = new Jugadas();
+            Detalles = new JugadaDetalle();
+
+        }
+    }
+    void Buscar()
+    {
+        if (this.jugadas.JugadaId > 0)
+        {
+            Jugadas encontrado = jugadasBLL.BuscarJ(this.jugadas.JugadaId);
+
+            if (encontrado != null)
+            {
+                this.jugadas = encontrado;
+            }
+
+        }
+    }
+
+    void Guardar()
+    {
+
+        if (jugadas.Monto > 0 && jugadas.TipoJugadaId !=0  && jugadas.LoteriaId !=0) 
+        {
+            var guardado = jugadasBLL.Guardar(this.jugadas);
+            if (guardado)
+            {
+                ShowNotification(
+                new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Guardado correctamente"
+                });
+                Nuevo();
+            }
+            else
+            {
+                ShowNotification(
+                new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al guardar"
+                });
+
+            }
+        }
+        else
+        {
+            ShowNotification(
+            new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al guardar"
+            });
+
+        }
+
+
+
+    }
+
+    public void Eliminar()
+    {
+        bool eliminado;
+        if (jugadas.Monto > 0 && jugadas.JugadaId > 1)
+        {
+            eliminado = jugadasBLL.Eliminar(jugadas);
+            if (eliminado)
+            {
+                ShowNotification(
+                new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Eliminado correctamente"
+                });
+                Nuevo();
+            }
+            else
+            {
+                ShowNotification(
+                new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error al eliminar"
+                });
+
+            }
+        }
+        else
+        {
+            ShowNotification(
+            new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error al eliminar"
+            });
+
+        }
+
+
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+    }
+
+
+}

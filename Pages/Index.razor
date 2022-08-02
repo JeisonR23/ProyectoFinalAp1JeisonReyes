@@ -1,0 +1,93 @@
+@page "/JJ"
+@page "/JJ/{GananciaId:int}"
+@attribute [Authorize]
+@inject DialogService dialogService
+@inject GananciasBLL gananciaBLL
+@inject JugadasBLL jugadasBLL
+
+<EditForm Model="ganancias">
+    <DataAnnotationsValidator />
+    <div class="card text-dark bg-light shadow-lg text-primary">
+        <div class="card-header text-center">
+            <h4 class=" text-center text-primary">Consulta de Ganancias</h4>
+        </div>
+        <div class="card-body opacity-75">
+
+       <input type="text" @bind-value="Detalles.GananciaId"> <button @onclick="Buscar">Buscar</button>
+
+            @* Tabla de detalles *@
+            <table class="table table-bordered table-light">
+                <thead class="thead">
+                    <tr class="table">
+                        <th>Ticker Id</th>
+                        <th>Loteria Id</th>
+                        <th>Tipo de Jugada Id</th>
+                        <th>Monto Jugado</th>
+                        <th>Monto Ganancia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ganancias.Detalle)
+                    {
+                        <tr>
+                            <td>@item.JugadaId</td>
+                            <td>@item.TipoJugadaId</td>
+                            <td>@item.LoteriaId</td>
+                            <td>@item.Montojugado</td>
+                            <td>@item.MontoGanancia</td>
+                        </tr>
+
+                    }
+
+                    @foreach (var item in jugada)
+                    {
+                        <tr>
+                            <td>@item.JugadaId</td>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Monto</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</EditForm>
+@code {
+
+
+    [Parameter]
+    public int GananciaId { get; set; }
+    public Ganancias ganancias { get; set; } = new Ganancias();
+    public List<Ganancias> ganancia { get; set; } = new List<Ganancias>();
+    public Jugadas jugadas { get; set; } = new Jugadas();
+    public List<Jugadas> jugada { get; set; } = new List<Jugadas>();
+    public GananciaDetalle Detalles { get; set; } = new GananciaDetalle();
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ganancias.GananciaId = GananciaId;
+        Buscar();
+
+    }
+
+
+
+
+    void Buscar()
+    {
+        if (this.ganancias.GananciaId > 0)
+        {
+            Ganancias encontrado = gananciaBLL.BuscarJ(this.ganancias.GananciaId);
+
+            if (encontrado != null)
+            {
+                this.ganancias = encontrado;
+            }
+            else{
+                Console.WriteLine("No se encontro");
+            }
+        }
+    }
+}

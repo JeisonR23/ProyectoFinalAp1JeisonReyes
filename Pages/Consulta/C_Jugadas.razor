@@ -1,0 +1,107 @@
+@page "/C_Jugadas"
+@attribute [Authorize]
+@inject DialogService dialogService
+@inject JugadasBLL jugadasBLL
+
+<EditForm Model="jugadas">
+    <DataAnnotationsValidator />
+    <div class="card text-dark bg-light shadow-lg text-primary">
+        <div class="card-header text-center">
+            <h4 class=" text-center text-primary">Consulta de Jugadas</h4>
+        </div>
+        <div class="card-body opacity-75">
+            <div class="row justify-content-between">
+                @*Jugada Id*@
+                <div class="col-3">
+                    <label>Jugada Id</label>
+                    <div class="input-group  mb-3">
+                        <InputNumber class="form-control" @bind-Value="jugadas.JugadaId" />
+                        <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
+                                class="oi oi-magnifying-glass" /> </button>
+                    </div>
+                </div>
+
+                @*Imprimir*@
+                  <div class="col-3 mt-3 ">
+                         <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
+                            class="bi bi-printer"/>Imprimir</button>
+                    </div>
+            </div>
+
+
+            @* Tabla de detalles *@
+            <table class="table table-bordered table-light">
+                <thead class="thead">
+                    <tr class="table">
+                        <th>JugadaId</th>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Detalles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in jugada)
+                    {
+                        <tr>
+                            <td>@item.JugadaId</td>
+                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Monto</td>
+                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="R_Jugadas/@item.JugadaId">Ver</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</EditForm>
+@code {
+
+    public Jugadas jugadas { get; set; } = new Jugadas();
+    public List<Jugadas> jugada { get; set; } = new List<Jugadas>();
+    byte[] reportData;
+    string pdfContent = "";
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+    }
+
+    void Buscar()
+    {
+        if (this.jugadas.JugadaId == 0)
+        {
+
+            jugada = jugadasBLL.GetList();
+        }
+        else
+        {
+            jugada = jugadasBLL.BuscarListaJ(jugadas.JugadaId);
+
+        }
+    }
+
+
+    async Task ShowInlineDialog()
+    {
+        RptResult rptResult = new RptResult();
+        reportData = rptResult.Report(jugada);
+        pdfContent = "data:application/pdf;base64, " + System.Convert.ToBase64String(reportData);
+        var result = await dialogService.OpenAsync("Reporte de Jugadas", ds =>
+
+    @<div>
+
+        @if (reportData is { })
+            {
+                <object data="@pdfContent" width="800" height="600" name="_blank" />
+
+            }
+
+        </div>
+    );
+
+
+    }
+
+}
