@@ -56,9 +56,9 @@ public class RptResult : PdfFooterPart
         {
             cell = new PdfPCell(new Phrase(_jugadas.JugadaId.ToString(), font));
             tblLocal.AddCell(cell);
-            cell = new PdfPCell(new Phrase(_jugadas.Fecha.ToString(), font));
+            cell = new PdfPCell(new Phrase(_jugadas.Fecha.ToString("yyyy-MM-dd"), font));
             tblLocal.AddCell(cell);
-            cell = new PdfPCell(new Phrase(_jugadas.Monto.ToString(), font));
+            cell = new PdfPCell(new Phrase(_jugadas.Monto.ToString("N2"), font));
             tblLocal.AddCell(cell);
         }
 

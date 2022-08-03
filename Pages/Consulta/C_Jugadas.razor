@@ -91,15 +91,13 @@
         var result = await dialogService.OpenAsync("Reporte de Jugadas", ds =>
 
     @<div>
-
         @if (reportData is { })
             {
-                <object data="@pdfContent" width="800" height="600" name="_blank" />
+                <object data="@pdfContent" width="800px" height="300px" name="_blank" />
 
             }
-
         </div>
-    );
+    , new DialogOptions() { Width = "850px", Height = "400px", Resizable = false, Draggable = false });
 
 
     }

@@ -115,7 +115,7 @@ public class GananciasBLL
 
     public List<Ganancias> GetList()
     {
-        return _contexto.Ganancias.AsNoTracking().ToList();
+        return _contexto.Ganancias.Include(x=> x.Detalle).AsNoTracking().ToList();
     }
 }
 

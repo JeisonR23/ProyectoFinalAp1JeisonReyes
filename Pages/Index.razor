@@ -1,93 +1,98 @@
 @page "/JJ"
-@page "/JJ/{GananciaId:int}"
-@attribute [Authorize]
-@inject DialogService dialogService
-@inject GananciasBLL gananciaBLL
-@inject JugadasBLL jugadasBLL
 
-<EditForm Model="ganancias">
-    <DataAnnotationsValidator />
-    <div class="card text-dark bg-light shadow-lg text-primary">
-        <div class="card-header text-center">
-            <h4 class=" text-center text-primary">Consulta de Ganancias</h4>
-        </div>
-        <div class="card-body opacity-75">
+@using System.Globalization
 
-       <input type="text" @bind-value="Detalles.GananciaId"> <button @onclick="Buscar">Buscar</button>
-
-            @* Tabla de detalles *@
-            <table class="table table-bordered table-light">
-                <thead class="thead">
-                    <tr class="table">
-                        <th>Ticker Id</th>
-                        <th>Loteria Id</th>
-                        <th>Tipo de Jugada Id</th>
-                        <th>Monto Jugado</th>
-                        <th>Monto Ganancia</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in ganancias.Detalle)
-                    {
-                        <tr>
-                            <td>@item.JugadaId</td>
-                            <td>@item.TipoJugadaId</td>
-                            <td>@item.LoteriaId</td>
-                            <td>@item.Montojugado</td>
-                            <td>@item.MontoGanancia</td>
-                        </tr>
-
-                    }
-
-                    @foreach (var item in jugada)
-                    {
-                        <tr>
-                            <td>@item.JugadaId</td>
-                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
-                            <td>@item.Monto</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<h1>Radzen Blazor Chart bar series</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 my-5">
+                <RadzenCard Class="w-100 mb-4" >
+                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
+                </RadzenCard>
+                <RadzenChart SeriesClick=@OnSeriesClick>
+                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
+                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                    </RadzenBarSeries>
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Revenue in USD" />
+                    </RadzenValueAxis>
+                    <RadzenBarOptions Radius="5" />
+                </RadzenChart>
+            </div>
         </div>
     </div>
-</EditForm>
+
+
 @code {
+   
+    bool showDataLabels = false;
 
-
-    [Parameter]
-    public int GananciaId { get; set; }
-    public Ganancias ganancias { get; set; } = new Ganancias();
-    public List<Ganancias> ganancia { get; set; } = new List<Ganancias>();
-    public Jugadas jugadas { get; set; } = new Jugadas();
-    public List<Jugadas> jugada { get; set; } = new List<Jugadas>();
-    public GananciaDetalle Detalles { get; set; } = new GananciaDetalle();
-
-
-    protected override void OnInitialized()
+    void OnSeriesClick(SeriesClickEventArgs args)
     {
-        base.OnInitialized();
-        ganancias.GananciaId = GananciaId;
-        Buscar();
-
+       
     }
 
-
-
-
-    void Buscar()
+    class DataItem
     {
-        if (this.ganancias.GananciaId > 0)
-        {
-            Ganancias encontrado = gananciaBLL.BuscarJ(this.ganancias.GananciaId);
-
-            if (encontrado != null)
-            {
-                this.ganancias = encontrado;
-            }
-            else{
-                Console.WriteLine("No se encontro");
-            }
-        }
+        public string Quarter { get; set; }
+        public double Revenue { get; set; }
     }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2019 = new DataItem[]
+    {
+    new DataItem
+    {
+        Quarter = "Q1",
+        Revenue = 234000
+    },
+    new DataItem
+    {
+        Quarter = "Q2",
+        Revenue = 284000
+    },
+    new DataItem
+    {
+        Quarter = "Q3",
+        Revenue = 274000
+    },
+    new DataItem
+    {
+        Quarter = "Q4",
+        Revenue = 294000
+    },
+    };
+
+    DataItem[] revenue2020 = new DataItem[] {
+    new DataItem
+    {
+    Quarter = "Q1",
+    Revenue = 254000
+    },
+    new DataItem
+    {
+    Quarter = "Q2",
+    Revenue = 324000
+    },
+    new DataItem
+    {
+    Quarter = "Q3",
+    Revenue = 354000
+    },
+    new DataItem
+    {
+    Quarter = "Q4",
+    Revenue = 394000
+    },
+
+    };
 }

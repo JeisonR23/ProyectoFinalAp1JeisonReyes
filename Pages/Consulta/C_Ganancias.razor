@@ -21,12 +21,12 @@
                     </div>
                 </div>
 
-                
+
                 @*Imprimir*@
-                  <div class="col-3 mt-3 ">
-                         <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
-                            class="bi bi-printer"/>Imprimir</button>
-                    </div>
+                <div class="col-3 mt-3 ">
+                    <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
+                            class="bi bi-printer" />Imprimir</button>
+                </div>
             </div>
 
             @* Tabla de detalles *@
@@ -92,12 +92,12 @@
 
         @if (reportData is { })
             {
-                <object data="@pdfContent" width="800" height="600" name="_blank" />
+                <object data="@pdfContent" width="800px" height="300px" name="_blank" />
 
             }
 
         </div>
-    );
+    , new DialogOptions() { Width = "850px", Height = "400px", Resizable = false, Draggable = false });
 
     }
 

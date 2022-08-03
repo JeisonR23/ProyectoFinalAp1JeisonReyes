@@ -56,9 +56,9 @@ public class RptGanancias : PdfFootGanacias
         {
             cell = new PdfPCell(new Phrase(_ganancias.GananciaId.ToString(), font));
             tblLocal.AddCell(cell);
-            cell = new PdfPCell(new Phrase(_ganancias.Fecha.ToString(), font));
+            cell = new PdfPCell(new Phrase(_ganancias.Fecha.ToString("dd/MM/yyyy"), font));
             tblLocal.AddCell(cell);
-            cell = new PdfPCell(new Phrase(_ganancias.Totalganancias.ToString(), font));
+            cell = new PdfPCell(new Phrase(_ganancias.Totalganancias.ToString("N2"), font));
             tblLocal.AddCell(cell);
         }
 
