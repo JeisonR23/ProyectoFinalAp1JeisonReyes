@@ -8,27 +8,46 @@
     <div class="card text-dark bg-light shadow-lg text-primary">
         <div class="card-header text-center">
             <h4 class=" text-center text-primary">Consulta de Jugadas</h4>
+
+            @*Imprimir*@
+            <div class="col-2 mt-4  float-right">
+                <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
+                        class="bi bi-printer" />Imprimir</button>
+            </div>
         </div>
         <div class="card-body opacity-75">
             <div class="row justify-content-between">
-                @*Jugada Id*@
+                @*Ganancia Id*@
                 <div class="col-3">
-                    <label>Jugada Id</label>
-                    <div class="input-group  mb-3">
+                    <label class="text-primary">Ganancia Id</label>
+                    <div class="input-group mb-3">
                         <InputNumber class="form-control" @bind-Value="jugadas.JugadaId" />
-                        <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
-                                class="oi oi-magnifying-glass" /> </button>
+                    </div>
+                </div>
+                @*Fecha1*@
+                <div class="col-3">
+                    <label class="text-primary">Fecha Desde</label>
+                    <div class="input-group mb-3">
+                        <InputDate @bind-Value="fecha1" class="form-control"></InputDate>
                     </div>
                 </div>
 
-                @*Imprimir*@
-                  <div class="col-3 mt-3 ">
-                         <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
-                            class="bi bi-printer"/>Imprimir</button>
+                @*Fecha2*@
+                <div class="col-3  ">
+                    <label class="  text-primary">Fecha Hasta</label>
+                    <div class="input-group mb-3">
+                        <InputDate @bind-Value="fecha2" class="form-control"></InputDate>
                     </div>
+                </div>
+
+
+                @*Buscar*@
+                <div class="col-3 mt-4 ">
+                    <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
+                            class="oi oi-magnifying-glass text-secondary" /> Buscar</button>
+                </div>
             </div>
-
-
+            <hr>
             @* Tabla de detalles *@
             <table class="table table-bordered table-light">
                 <thead class="thead">
@@ -43,10 +62,11 @@
                     @foreach (var item in jugada)
                     {
                         <tr>
-                            <td>@item.JugadaId</td>
-                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
-                            <td>@item.Monto</td>
-                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="R_Jugadas/@item.JugadaId">Ver</a>
+                            <td class="table-light">@item.JugadaId</td>
+                            <td class="table-light">@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td class="table-light">@item.Monto</td>
+                            <td class="table-light"><a class="btn btn-sm btn-outline-primary oi oi-eye"
+                                href="R_Jugadas/@item.JugadaId">Ver</a>
                             </td>
                         </tr>
                     }
@@ -59,21 +79,31 @@
 
     public Jugadas jugadas { get; set; } = new Jugadas();
     public List<Jugadas> jugada { get; set; } = new List<Jugadas>();
+
+    public DateTime fecha1 { get; set; } = new DateTime(2022, 8, 1);
+    public DateTime fecha2 { get; set; }
+
+
     byte[] reportData;
     string pdfContent = "";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        fecha2 = DateTime.Now;
 
     }
 
     void Buscar()
     {
+        if(fecha2 !=null)
+        {
+           fecha2 = fecha2.AddHours(23).AddMinutes(59).AddSeconds(59);
+        }
         if (this.jugadas.JugadaId == 0)
         {
 
-            jugada = jugadasBLL.GetList();
+            jugada = jugadasBLL.BuscarFecha(fecha1, fecha2);
         }
         else
         {
@@ -81,7 +111,6 @@
 
         }
     }
-
 
     async Task ShowInlineDialog()
     {

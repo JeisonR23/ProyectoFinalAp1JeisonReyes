@@ -18,9 +18,9 @@
 
                 <div class="row justify-content-between">
                     @*Compra Id*@
-                    <div class="col-3">
-                        <label>Ticker Id</label>
-                        <div class="input-group mb-3">
+                    <div class="col-4">
+                        <label class=" text-primary">Ticker Id</label>
+                        <div class="input-group mb-3  float-left">
                             <InputNumber class="form-control" @bind-Value="jugadas.JugadaId" />
                             <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
                                     class="oi oi-magnifying-glass" /> </button>
@@ -28,17 +28,15 @@
                     </div>
 
                     @*Fecha*@
-                    <div class="col-3">
-                        <label>Fecha</label>
+                    <div class="col-4  float-right">
+                        <label class=" text-primary">Fecha</label>
                         <InputDate class="form-control" @bind-Value="jugadas.Fecha" />
                     </div>
                 </div>
 
-
-
                 @*Loteria*@
                 <div class="col-12">
-                    <label>Loteria</label>
+                    <label class=" text-primary">Loteria</label>
                     <InputSelect class="form-select" @bind-Value="jugadas.LoteriaId">
                         <option value="0" disabled> Seleccione </option>
                         @foreach (var loteria in list)
@@ -50,8 +48,8 @@
                 </div>
 
                 @*TipoJugada*@
-                <div class="col-12">
-                    <label>Tipo de Jugada</label>
+                <div class="col-12 text-primary">
+                    <label class=" text-primary">Tipo de Jugada</label>
                     <InputSelect class="form-select" @bind-Value="jugadas.TipoJugadaId">
                         <option value="0" disabled> Seleccione </option>
                         @foreach (var tipoJugada in lista)
@@ -64,7 +62,7 @@
 
                 @*Monto*@
                 <div class="col-12">
-                    <label>Monto Jugado</label>
+                    <label class=" text-primary">Monto Jugado</label>
                     <div class="input-group mb-3">
                         <InputNumber class="form-control" @bind-Value="jugadas.Monto" />
                     </div>
@@ -81,13 +79,6 @@
             <button type="submit" class="btn btn-success"> <i class="oi oi-document"> Guardar </i></button>
             <button type="button" class="btn btn-danger" @onclick="Eliminar"><i class="oi oi-trash"> Eliminar
                 </i></button>
-        </div>
-    </div>
-    @*Total*@
-    <div class="row  d-flex justify-content-end mb-3">
-        <div class="col-3">
-            <label>Monto Jugado</label>
-            <span class="form-control"> @jugadas.Monto.ToString("N2") </span>
         </div>
     </div>
 </EditForm>

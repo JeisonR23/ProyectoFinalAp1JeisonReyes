@@ -1,98 +1,89 @@
 @page "/JJ"
+@page "/JJ/{GananciaId:int}"
+@inject GananciasBLL gananciaBLL
+@inject JugadasBLL jugadasBLL
 
-@using System.Globalization
-
-<h1>Radzen Blazor Chart bar series</h1>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12 my-5">
-                <RadzenCard Class="w-100 mb-4" >
-                    <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                    <RadzenLabel Text="Show Data Labels" For="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-                </RadzenCard>
-                <RadzenChart SeriesClick=@OnSeriesClick>
-                    <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </RadzenBarSeries>
-                    <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </RadzenBarSeries>
-                    <RadzenValueAxis Formatter="@FormatAsUSD">
-                        <RadzenGridLines Visible="true" />
-                        <RadzenAxisTitle Text="Revenue in USD" />
-                    </RadzenValueAxis>
-                    <RadzenBarOptions Radius="5" />
-                </RadzenChart>
+<div class="container">
+    <div>
+        <h1 class=" text-center text-secondary">Bienvenidos</h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <div class="card-header">
+                <h4 class=" text-center text-primary">Porcentaje de Ganancias X Loterias</h4>
             </div>
+            <RadzenChart SeriesClick=@OnSeriesClick>
+                <RadzenBarSeries Data="@resumenGanancias" CategoryProperty="Nombre" Title="Ganacias"
+                    LineType="LineType.Dashed" ValueProperty="Ganancia">
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </RadzenBarSeries>
+                <RadzenBarOptions Radius="5" />
+            </RadzenChart>
         </div>
     </div>
+</div>
+
+<div>
+    
+    <div>
+        @if (gananciasList.Sum(a=>a.Detalle.Sum(d=>d.MontoGanancia- d.Montojugado))>0)
+        {
+            <h3 style="color: green;"> Ganancias Totales: @gananciasList.Sum(a=>a.Detalle.Sum(d=> d.MontoGanancia -
+            d.Montojugado)).ToString("N2")</h3>
+        }else
+        {
+            <h3 style="color: red;"> Ganancias Totales: @gananciasList.Sum(a=>a.Detalle.Sum(d=> d.MontoGanancia -
+            d.Montojugado)).ToString("N2")</h3>
+
+        }
+
+    </div>
+
+</div>
+
+
+
+
 
 
 @code {
-   
-    bool showDataLabels = false;
 
+
+    [Parameter]
+    public int GananciaId { get; set; }
+
+    public Jugadas jugadas { get; set; } = new Jugadas();
+
+    public Ganancias ganancias { get; set; } = new Ganancias();
+    public List<Ganancias> gananciasList { get; set; } = new List<Ganancias>();
+    public List<ResumenGanancias> resumenGanancias { get; set; } = new List<ResumenGanancias>();
+    bool showDataLabels = true;
+
+    double TotalJugado;
+
+    protected override void OnInitialized()
+    {
+        resumenGanancias = gananciaBLL.jugadasXganancias();
+        ganancias.GananciaId = GananciaId;
+        Buscars();
+    }
     void OnSeriesClick(SeriesClickEventArgs args)
     {
-       
+
     }
 
-    class DataItem
+    void Buscars()
     {
-        public string Quarter { get; set; }
-        public double Revenue { get; set; }
+        if (this.ganancias.GananciaId == 0)
+        {
+            gananciasList = gananciaBLL.GetList();
+        }
+        else
+        {
+            gananciasList = gananciaBLL.GetList().Where(g => g.GananciaId == GananciaId).ToList();
+
+        }
+
     }
 
-    string FormatAsUSD(object value)
-    {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
-    }
-
-    DataItem[] revenue2019 = new DataItem[]
-    {
-    new DataItem
-    {
-        Quarter = "Q1",
-        Revenue = 234000
-    },
-    new DataItem
-    {
-        Quarter = "Q2",
-        Revenue = 284000
-    },
-    new DataItem
-    {
-        Quarter = "Q3",
-        Revenue = 274000
-    },
-    new DataItem
-    {
-        Quarter = "Q4",
-        Revenue = 294000
-    },
-    };
-
-    DataItem[] revenue2020 = new DataItem[] {
-    new DataItem
-    {
-    Quarter = "Q1",
-    Revenue = 254000
-    },
-    new DataItem
-    {
-    Quarter = "Q2",
-    Revenue = 324000
-    },
-    new DataItem
-    {
-    Quarter = "Q3",
-    Revenue = 354000
-    },
-    new DataItem
-    {
-    Quarter = "Q4",
-    Revenue = 394000
-    },
-
-    };
 }

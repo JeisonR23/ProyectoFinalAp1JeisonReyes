@@ -19,7 +19,7 @@
 
                     @*Ganancia Id*@
                     <div class="col-3">
-                        <label>Ganancia Id</label>
+                        <label class="text-primary">Ganancia Id</label>
                         <div class="input-group mb-3">
                             <InputNumber class="form-control" @bind-Value="ganancia.GananciaId" />
                             <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
@@ -29,7 +29,7 @@
 
                     @*Fecha*@
                     <div class="col-3">
-                        <label>Fecha</label>
+                        <label class="text-primary">Fecha</label>
                         <InputDate class="form-control" @bind-Value="ganancia.Fecha" />
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     <div class="row">
                         @*Jugada Id*@
                         <div class="col-4">
-                            <label>Ticker Id</label>
+                            <label class="text-primary">Ticker Id</label>
                             <InputSelect class="form-select" @bind-Value="Detalles.JugadaId">
                                 <option value="0" disabled> Seleccione </option>
                                 @foreach (var tipoJugada in jugadas)
@@ -54,13 +54,14 @@
                         @*Monto Premio*@
                         <div class="col-4">
 
-                            <label>Monto Ganancia</label>
+                            <label class="text-primary">Monto Ganancia</label>
                             <InputNumber class="form-control" @bind-Value="Detalles.MontoGanancia"></InputNumber>
                         </div>
 
                         @* Boton agregar *@
                         <div class="col-4 mt-4">
-                               <RadzenButton Click=@(args => AgregarDetalle()) Text="Agregar Detalle" Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary"/>
+                            <RadzenButton Click=@(args => AgregarDetalle()) Text="Agregar Detalle"
+                                Icon="add_circle_outline" ButtonStyle="ButtonStyle.Secondary" />
 
                         </div>
 
@@ -87,8 +88,8 @@
                                 <td>@item.JugadaId</td>
                                 <td>@item.TipoJugadaId</td>
                                 <td>@item.LoteriaId</td>
-                                <td>@item.Montojugado</td>
-                                <td>@item.MontoGanancia</td>
+                                <td>@item.Montojugado.ToString("N2")</td>
+                                <td>@item.MontoGanancia.ToString("N2")</td>
                             </tr>
                         }
                     </tbody>
@@ -104,13 +105,6 @@
                         </i></button>
                 </div>
             </div>
-            @*Total*@
-            <div class="row  d-flex justify-content-end mb-3">
-                <div class="col-3">
-                    <label>Total Ganancia</label>
-                    <span class="form-control"> @ganancia.Totalganancias.ToString("N2") </span>
-                </div>
-            </div>
         </div>
     </EditForm>
 </div>
@@ -123,7 +117,7 @@
     public List<Loterias> list { get; set; }
     public List<TipoJugada> lista { get; set; }
     public GananciaDetalle Detalles { get; set; } = new GananciaDetalle();
-    public JugadaDetalle detalle { get; set; } = new JugadaDetalle();
+
 
     protected override void OnInitialized()
     {
@@ -152,7 +146,7 @@
             Detalles.Montojugado = jugada.Monto;
             jugada.MontoGanancia = Detalles.MontoGanancia;
             ganancia.Detalle.Add(Detalles);
-            ganancia.Totalganancias += Detalles.MontoGanancia;
+            ganancia.Totalganancias += Detalles.MontoGanancia - jugada.Monto;
             Detalles = new GananciaDetalle();
 
             ShowNotification(
@@ -203,7 +197,7 @@
     {
 
 
-        if (ganancia.Totalganancias != 0 || ganancia.Totalganancias < 0)
+        if (ganancia.Totalganancias != 0 || ganancia.Totalganancias >= 0 )
         {
             var guardado = gananciaBLL.Guardar(this.ganancia);
             if (guardado)
@@ -236,16 +230,13 @@
                 Severity = NotificationSeverity.Error,
                 Summary = "Error al guardar"
             });
-
-
         }
-
     }
 
     public void Eliminar()
     {
         bool eliminado;
-        if (ganancia.Totalganancias != 0 || ganancia.Totalganancias < 0)
+        if (ganancia.Totalganancias != 0 && ganancia.GananciaId > 0)
         {
             eliminado = gananciaBLL.Eliminar(ganancia);
             if (eliminado)
@@ -279,8 +270,6 @@
             });
 
         }
-
-
 
     }
 

@@ -21,6 +21,15 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 
+builder.Services.AddAuthentication().AddGoogle(g =>
+{
+    g.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    g.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+
+});
+   
+
 //Add Services BLL
 builder.Services.AddScoped<GananciasBLL>();
 builder.Services.AddScoped<JugadasBLL>();

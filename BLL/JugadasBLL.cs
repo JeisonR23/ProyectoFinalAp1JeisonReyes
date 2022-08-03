@@ -61,7 +61,7 @@ public class JugadasBLL
     {
 
         var fechas = _contexto.Jugadas
-         .Where(f => f.Fecha.Date == fecha.Date || f.Fecha.Date == fecha2.Date)
+         .Where(f=> f.Fecha >= fecha && f.Fecha <= fecha2)
          .AsNoTracking().ToList();
         return fechas;
     }

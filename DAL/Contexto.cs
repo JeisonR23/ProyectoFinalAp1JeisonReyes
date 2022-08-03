@@ -10,14 +10,16 @@ public class Contexto : IdentityDbContext
     public DbSet<Loterias> Loterias { get; set; }
 
     public DbSet<TipoJugada> tipoJugada { get; set; }
+
+    public DbSet<ResumenGanancias> ResumenGanancias { get; set; }
     public Contexto(DbContextOptions<Contexto> options)
         : base(options)
     {
     }
 
-        protected override void OnModelCreating(ModelBuilder model)
+    protected override void OnModelCreating(ModelBuilder model)
     {
-          base.OnModelCreating(model);
+        base.OnModelCreating(model);
 
 
         model.Entity<Loterias>().HasData
@@ -71,47 +73,51 @@ public class Contexto : IdentityDbContext
                 NombreJugada = "Loto"
             },
              new TipoJugada
-            {
-                TipoJugadaId = 2,
-                NombreJugada = "Loto Pool"
-            },
+             {
+                 TipoJugadaId = 2,
+                 NombreJugada = "Loto Pool"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 3,
-                NombreJugada = "Quiniela Pale"
-            },
+             {
+                 TipoJugadaId = 3,
+                 NombreJugada = "Quiniela Pale"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 4,
-                NombreJugada = "Super Kino"
-            },
+             {
+                 TipoJugadaId = 4,
+                 NombreJugada = "Super Kino"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 5,
-                NombreJugada = "Tripleta"
-            },
+             {
+                 TipoJugadaId = 5,
+                 NombreJugada = "Tripleta"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 6,
-                NombreJugada = "Pega Mas"
-            },
+             {
+                 TipoJugadaId = 6,
+                 NombreJugada = "Pega Mas"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 7,
-                NombreJugada = "Quiniela"
-            },
+             {
+                 TipoJugadaId = 7,
+                 NombreJugada = "Quiniela"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 8,
-                NombreJugada = "Pale"
-            },
+             {
+                 TipoJugadaId = 8,
+                 NombreJugada = "Pale"
+             },
              new TipoJugada
-            {
-                TipoJugadaId = 9,
-                NombreJugada = "Pega 3 Mas"
-            }
+             {
+                 TipoJugadaId = 9,
+                 NombreJugada = "Pega 3 Mas"
+             }
 
         );
+
+        model.Entity<ResumenGanancias>()
+            .ToView("View_Ganancias")
+            .HasNoKey();
 
     }
 

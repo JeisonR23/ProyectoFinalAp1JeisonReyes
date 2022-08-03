@@ -65,7 +65,7 @@ public class GananciasBLL
     {
 
         var fechas = _contexto.Ganancias
-         .Where(f => f.Fecha.Date == fecha.Date || f.Fecha.Date == fecha2.Date)
+         .Where(f=> f.Fecha >= fecha && f.Fecha <= fecha2)
          .AsNoTracking().ToList();
         return fechas;
     }
@@ -117,5 +117,14 @@ public class GananciasBLL
     {
         return _contexto.Ganancias.Include(x=> x.Detalle).AsNoTracking().ToList();
     }
+
+    public List<ResumenGanancias> jugadasXganancias()
+    {
+         return _contexto.ResumenGanancias.AsNoTracking().ToList();
+
+    }
+
+
+
 }
 

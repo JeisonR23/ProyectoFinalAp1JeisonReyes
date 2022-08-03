@@ -8,34 +8,53 @@
     <div class="card text-dark bg-light shadow-lg text-primary">
         <div class="card-header text-center">
             <h4 class=" text-center text-primary">Consulta de Ganancias</h4>
+
+            @*Imprimir*@
+            <div class="col-2 mt-4 float-right">
+                <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
+                        class="bi bi-printer" />Imprimir</button>
+            </div>
         </div>
         <div class="card-body opacity-75">
             <div class="row justify-content-between">
                 @*Ganancia Id*@
                 <div class="col-3">
-                    <label>Ganancia Id</label>
+                    <label class=" text-primary">Ganancia Id</label>
                     <div class="input-group mb-3">
                         <InputNumber class="form-control" @bind-Value="ganancias.GananciaId" />
-                        <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
-                                class="oi oi-magnifying-glass" /> </button>
+                    </div>
+                </div>
+                @*Fecha1*@
+                <div class="col-3">
+                    <label class="text-primary">Fecha Desde</label>
+                    <div class="input-group mb-3">
+                        <InputDate @bind-Value="fecha1" class="form-control"></InputDate>
+                    </div>
+                </div>
+
+                @*Fecha2*@
+                <div class="col-3  ">
+                    <label class="  text-primary">Fecha Hasta</label>
+                    <div class="input-group mb-3">
+                        <InputDate @bind-Value="fecha2" class="form-control"></InputDate>
                     </div>
                 </div>
 
 
-                @*Imprimir*@
-                <div class="col-3 mt-3 ">
-                    <button @onclick="ShowInlineDialog" class="btn btn-outline-primary" type="button"> <i
-                            class="bi bi-printer" />Imprimir</button>
+                @*Buscar*@
+                <div class="col-3 mt-4 ">
+                    <button @onclick="Buscar" class="btn btn-outline-primary" type="button"> <i
+                            class="oi oi-magnifying-glass text-secondary" /> Buscar</button>
                 </div>
             </div>
-
+            <hr>
             @* Tabla de detalles *@
             <table class="table table-bordered table-light">
                 <thead class="thead">
                     <tr class="table">
-                        <th>JugadaId</th>
+                        <th>GananciaId</th>
                         <th>Fecha</th>
-                        <th>Ganancias</th>
+                        <th>Monto Ganando</th>
                         <th>Detalles</th>
                     </tr>
                 </thead>
@@ -43,10 +62,10 @@
                     @foreach (var item in ganancia)
                     {
                         <tr>
-                            <td>@item.GananciaId</td>
-                            <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
-                            <td>@item.Totalganancias</td>
-                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye"
+                            <td class="table-light">@item.GananciaId</td>
+                            <td class="table-light">@item.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td class="table-light">@item.Totalganancias</td>
+                            <td class="table-light"><a class="btn btn-sm btn-outline-primary oi oi-eye"
                                 href="R_Ganancias/@item.GananciaId">Ver</a></td>
                         </tr>
                     }
@@ -59,20 +78,29 @@
 
     public Ganancias ganancias { get; set; } = new Ganancias();
     public List<Ganancias> ganancia { get; set; } = new List<Ganancias>();
+    public DateTime fecha1 { get; set; } = new DateTime(2022, 8, 1);
+    public DateTime fecha2 { get; set; }
 
     byte[] reportData;
     string pdfContent = "";
 
     protected override void OnInitialized()
     {
-        base.OnInitialized();
+        fecha2 = DateTime.Now;
     }
+
+
     void Buscar()
     {
+
+        if (fecha2 != null)
+        {
+            fecha2 = fecha2.AddHours(23).AddMinutes(59).AddSeconds(59);
+        }
+
         if (this.ganancias.GananciaId == 0)
         {
-
-            ganancia = gananciaBLL.GetList();
+            ganancia = gananciaBLL.Buscar(fecha1, fecha2);
         }
         else
         {
@@ -80,6 +108,8 @@
 
         }
     }
+
+
 
     async Task ShowInlineDialog()
     {

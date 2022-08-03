@@ -1,0 +1,89 @@
+@page "/datagrid-simple-filter"
+@page "/datagrid-simple-filter/{GananciaId:int}"
+@attribute [Authorize]
+@inject DialogService dialogService
+@inject GananciasBLL gananciaBLL
+@inject JugadasBLL jugadasBLL
+
+<EditForm Model="ganancias">
+    <DataAnnotationsValidator />
+    <div class="card text-dark bg-light shadow-lg text-primary">
+        <div class="card-header text-center">
+            <h4 class=" text-center text-primary">Consulta de Ganancias</h4>
+        </div>
+        <div class="card-body opacity-75">
+           
+            @* Tabla de detalles *@
+            <hr />
+            <table class="table table-bordered table-light">
+                <thead class="thead">
+                    <tr class="table">
+                        <th>Ticker Id</th>
+                        <th>Loteria Id</th>
+                        <th>Tipo de Jugada Id</th>
+                        <th>Monto Jugado</th>
+                        <th>Monto Ganancia</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var ganancia in gananciasList)
+                    {
+                        @foreach (var item in ganancia.Detalle)
+                        {
+                            <tr>
+                                <td>@item.JugadaId</td>
+                                <td>@item.TipoJugadaId</td>
+                                <td>@item.LoteriaId</td>
+                                <td>@item.Montojugado</td>
+                                <td>@item.MontoGanancia</td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+
+            </table>
+        </div>
+
+        @*Total*@
+        <div class="row  d-flex justify-content-end mb-3">
+            <div class="col-3">
+                <label>Total Ganancia</label>
+                <span class="form-control"> @gananciasList.Sum(a=>a.Detalle.Sum(d=> d.MontoGanancia - d.Montojugado)).ToString("N2") </span>
+            </div>
+        </div>
+    </div>
+</EditForm>
+@code {
+
+    [Parameter]
+    public int GananciaId { get; set; }
+    public Ganancias ganancias { get; set; } = new Ganancias();
+    public List<Ganancias> gananciasList { get; set; } = new List<Ganancias>();
+   
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ganancias.GananciaId = GananciaId;
+        Buscars();
+
+
+
+    }
+
+
+    void Buscars()
+    {
+        if (this.ganancias.GananciaId == 0)
+        {
+            gananciasList = gananciaBLL.GetList();
+        }
+        else
+        {
+            gananciasList = gananciaBLL.GetList().Where(g => g.GananciaId == GananciaId).ToList();
+
+        }
+            
+    }
+}
